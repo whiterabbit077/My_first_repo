@@ -1,0 +1,93 @@
+---
+title: "R Objects, Workflow and Functions"
+format: html
+editor: visual
+---
+
+# Vectors
+
+Create a vector
+
+```{r}
+set.seed(12345)
+my_runif <- runif(30)
+print(my_runif)
+is.vector(my_runif)
+```
+
+Subset that thing
+
+```{r}
+my_runif[1:10]
+my_runif[c(1,3,14:15)]
+```
+
+Sort this thing
+
+```{r}
+sort(my_runif)
+```
+
+Character vector
+
+```{r}
+char_vec <- c("23a","1b","sdc","abd")
+sort(char_vec)
+```
+# Data frames
+
+```{r}
+data(trees)
+trees
+str(trees)
+```
+Subset a column
+
+```{r}
+trees$Girth
+```
+Get attributes 
+
+```{r}
+attributes(trees)
+names(trees)
+colnames(trees)[2:3]
+```
+# Lists
+
+investiagitng our data frame
+
+```{r}
+is.list(trees)
+is.data.frame(trees)
+```
+
+```{r}
+trees[1:2]
+trees[[1]]
+```
+look at the ln model
+
+```{r}
+fit <- lm(Volume ~ Height | Girth, data=trees)
+```
+
+Look at the structure using restric function()
+
+```{r}
+str(fit, max.level = 1)
+
+```
+
+Some helper functions
+
+```{r}
+fit$coefficients
+coef(fit)
+
+fit$residuals
+residuals(fit)
+
+#rank(fit)
+```
+
