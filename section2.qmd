@@ -91,3 +91,28 @@ residuals(fit)
 #rank(fit)
 ```
 
+# if/then/else
+
+Fizz buzz challenge
+
+-take a number
+-if it is divisable by 3 return fizz
+if its divisable by 5 teturn buzz
+-if it is divisable by 15 return fizz buzz
+
+
+```{r}
+number <- 2
+
+if((number %% 15) == 0) {
+  print("fizz buzz")
+} else if((number %% 5) == 0){
+  print("buzz")
+} else if((number %% 3) == 0){
+  print("fizz")
+} else {
+  print("error")
+}
+
+```
+
