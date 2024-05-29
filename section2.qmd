@@ -116,3 +116,238 @@ if((number %% 15) == 0) {
 
 ```
 
+# Loops
+
+Wrap the fizz buzz code into a loop to check for multiple values
+
+```{r}
+for (number in -1:41){
+    if((number %% 15) == 0) {
+    print("fizz buzz")
+  } else if((number %% 5) == 0){
+    print("buzz")
+  } else if((number %% 3) == 0){
+    print("fizz")
+  } else {
+    print("error")
+  }
+}
+
+```
+# Control Flow: Vectorized Functions
+
+```{r}
+library(Lahman)
+my_batting <- Batting[, c("playerID", "teamID", "G", "AB", "R", "H", "X2B", "X3B", "HR")]
+head(my_batting)
+
+colMeans(my_batting[, 3:9])
+```
+```{r}
+library(matrixStats)
+colMedians(as.matrix(my_batting[, 3:9]))
+```
+
+```{r}
+library(microbenchmark)
+my_numeric_batting <- Lahman::Batting[, 6:22] #get all numeric columns
+my_numeric_batting
+
+vectorized_results <- microbenchmark(
+  colMeans(my_numeric_batting, na.rm = TRUE)
+)
+
+loop_results <- microbenchmark(
+  for(i in 1:17){
+    mean(my_numeric_batting[, i], na.rm = TRUE)
+  }
+)
+
+vectorized_results
+loop_results
+```
+
+Vectorized ifelse
+
+```{r}
+ifelse(airquality$Wind >= 15, "HighWind",
+          ifelse(airquality$Wind >= 10, "Windy",
+                 ifelse(airquality$Wind >= 6, "LightWind", 
+                        ifelse(airquality$Wind >= 0, "Calm", "Error"))))
+```
+
+```{r}
+loopTime<-microbenchmark(
+  for (i in seq_len(nrow(airquality))){
+    if(airquality$Wind[i] >= 15){
+       "HighWind"
+    } else if (airquality$Wind[i] >= 10){
+      "Windy"
+    } else if (airquality$Wind[i] >= 6){
+      "LightWind"
+    } else if (airquality$Wind[i] >= 0){
+      "Calm"
+    } else{
+      "Error"
+    }
+  }
+, unit = "us")
+
+vectorTime <- microbenchmark(
+  ifelse(airquality$Wind >= 15, "HighWind",
+         ifelse(airquality$Wind >= 10, "Windy",
+                ifelse(airquality$Wind >= 6, "LightWind", 
+                       ifelse(airquality$Wind >= 0, "Calm", "Error"))))
+)
+
+loopTime
+vectorTime
+```
+
+# Functions
+
+```{r}
+standardize <- function(vector) {
+  return((vector - mean(vector)) / sd(vector))
+}
+
+set.seed(10)
+data <- runif(15)
+data
+
+result <- standardize(data)
+result
+
+mean(result)
+sd(result)
+```
+
+```{r}
+standardize <- function(vector, center, scale) {
+  if (center) {
+    vector <- vector - mean(vector)
+    }
+  if (scale) {
+    vector <- vector / sd(vector)
+    }
+  return(vector)
+}
+
+result <- standardize(data, center = TRUE, scale = TRUE)
+result
+
+result <- standardize(data, center = FALSE, scale = TRUE)
+result
+```
+
+```{r}
+standardize <- function(vector, center = TRUE, scale = TRUE) {
+  mean <- mean(vector) #save these so we can return them
+  stdev <- sd(vector)
+  if (center) {
+    vector <- vector - mean
+    }
+  if (scale) {
+    vector <- vector / stdev
+    }
+  return(list(vector, mean, stdev))
+}
+
+result <- standardize(data)
+result  
+```
+
+```{r}
+standardize <- function(vector, center = TRUE, scale = TRUE) {
+  mean <- mean(vector)
+  stdev <- sd(vector)
+  if (center) {
+    vector <- vector - mean
+    }
+  if (scale) {
+    vector <- vector / stdev
+    }
+  return(list(result = vector, mean = mean, sd = stdev))
+}
+
+result <- standardize(data, center = TRUE, scale = TRUE)
+result  
+```
+
+```{r}
+library(dplyr)
+arrange(select(filter(as_tibble(Lahman::Batting),teamID=="PIT"),playerID, G, X2B), desc(X2B))
+```
+
+```{r}
+Lahman::Batting |> #read the pipe as "then"
+  as_tibble() |>
+  filter(teamID == "PIT") |>
+  select(playerID, G, X2B) |> 
+  arrange(desc(X2B)) 
+```
+
+
+# writing R Functions
+
+Normal approximation to the binomial.
+
+```{r}
+
+n <- 40
+prob <- 0.3
+
+dbinom(0:n, size=n, prob=prob)
+plot(0:n, dbinom(0:n, size=n, prob=prob), type="h")
+
+norm_x <- seq(from=0, to=n, length=1000)
+lines(norm_x,
+      dnorm(norm_x, mean = n*prob, sd=sqrt(n*prob*(1-prob)))
+)
+```
+
+let's write a function to make the plotfor any $n$ and $p$ we give it. 
+
+```{r}
+plot_norm_approx <- function(n,prob){
+  dbinom(0:n, size=n, prob=prob)
+  plot(0:n, 
+       dbinom(0:n, size=n, prob=prob), 
+       type="h"
+       )
+
+  norm_x <- seq(from=0, to=n, length=1000)
+  lines(norm_x,
+        dnorm(norm_x, 
+              mean = n*prob, 
+              sd=sqrt(n*prob*(1-prob)))
+        )
+}
+```
+Test it out
+
+```{r}
+plot_norm_approx(50, 0.5)
+```
+
+Add some defaults
+
+```{r}
+plot_norm_approx <- function(n = 30,prob=0.5){
+  dbinom(0:n, size=n, prob=prob)
+  plot(0:n, 
+       dbinom(0:n, size=n, prob=prob), 
+       type="h"
+       )
+
+  norm_x <- seq(from=0, to=n, length=1000)
+  lines(norm_x,
+        dnorm(norm_x, 
+              mean = n*prob, 
+              sd=sqrt(n*prob*(1-prob)))
+        )
+}
+
+plot_norm_approx()
+```
+
