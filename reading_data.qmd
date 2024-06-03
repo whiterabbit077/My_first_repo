@@ -21,4 +21,42 @@ read_fwf(
   skip=1)
 ```
 
+## Reading in an excel file
+
+```{r}
+library(readxl)
+dry_bean_data <- readxl::read_excel("https://www4.stat.ncsu.edu/~online/datasets/Dry_Bean_Dataset.xlsx")
+dry_bean_data
+```
+
+
+```{r}
+library(readxl)
+library(httr)
+
+# Specify the URL of the file
+url <- "https://www4.stat.ncsu.edu/~online/datasets/Dry_Bean_Dataset.xlsx"
+
+# Download the file to a temporary location
+temp_file <- tempfile(fileext = ".xlsx")
+GET(url, write_disk(temp_file, overwrite = TRUE))
+
+# Read the downloaded file
+dry_bean_data <- read_excel(temp_file)
+dry_bean_data
+
+```
+
+```{r}
+excel_sheets(temp_file)
+```
+
+```{r}
+citation_dry_bean_data <- read_excel(temp_file, 
+                            sheet = excel_sheets(temp_file)[2],
+                            col_names = F)
+citation_dry_bean_data
+
+cat(dplyr::pull(citation_dry_bean_data, 1))
+```
 
