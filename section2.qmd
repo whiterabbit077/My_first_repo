@@ -1,6 +1,6 @@
 ---
 title: "R Objects, Workflow and Functions"
-format: html
+format: pdf #html
 editor: visual
 ---
 
