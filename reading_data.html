@@ -137,6 +137,82 @@ dbl (4): tar, nicotine, weight, co
 </div>
 </div>
 </section>
+<section id="reading-in-an-excel-file" class="level2">
+<h2 class="anchored" data-anchor-id="reading-in-an-excel-file">Reading in an excel file</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#dry_bean_data &lt;- readxl::read_excel("https://www4.stat.ncsu.edu/~online/datasets/Dry_Bean_Dataset.xlsx")</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#dry_bean_data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the URL of the file</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://www4.stat.ncsu.edu/~online/datasets/Dry_Bean_Dataset.xlsx"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Download the file to a temporary location</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>temp_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".xlsx"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">GET</span>(url, <span class="fu">write_disk</span>(temp_file, <span class="at">overwrite =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Response [https://www4.stat.ncsu.edu/~online/datasets/Dry_Bean_Dataset.xlsx]
+  Date: 2024-06-03 15:55
+  Status: 200
+  Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+  Size: 3.04 MB
+&lt;ON DISK&gt;  C:\Users\ag434\AppData\Local\Temp\RtmpGmkhhE\file5ea866d13e2b.xlsx</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the downloaded file</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dry_bean_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(temp_file)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dry_bean_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 13,611 × 17
+    Area Perimeter MajorAxisLength MinorAxisLength AspectRatio Eccentricity
+   &lt;dbl&gt;     &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;
+ 1 28395      610.            208.            174.        1.20        0.550
+ 2 28734      638.            201.            183.        1.10        0.412
+ 3 29380      624.            213.            176.        1.21        0.563
+ 4 30008      646.            211.            183.        1.15        0.499
+ 5 30140      620.            202.            190.        1.06        0.334
+ 6 30279      635.            213.            182.        1.17        0.520
+ 7 30477      670.            211.            184.        1.15        0.489
+ 8 30519      630.            213.            183.        1.17        0.514
+ 9 30685      636.            214.            183.        1.17        0.514
+10 30834      632.            217.            181.        1.20        0.554
+# ℹ 13,601 more rows
+# ℹ 11 more variables: ConvexArea &lt;dbl&gt;, EquivDiameter &lt;dbl&gt;, Extent &lt;dbl&gt;,
+#   Solidity &lt;dbl&gt;, Roundness &lt;dbl&gt;, Compactness &lt;dbl&gt;, ShapeFactor1 &lt;dbl&gt;,
+#   ShapeFactor2 &lt;dbl&gt;, ShapeFactor3 &lt;dbl&gt;, ShapeFactor4 &lt;dbl&gt;, Class &lt;chr&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">excel_sheets</span>(temp_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Dry_Beans_Dataset" "Citation_Request" </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>citation_dry_bean_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(temp_file, </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">sheet =</span> <span class="fu">excel_sheets</span>(temp_file)[<span class="dv">2</span>],</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">col_names =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+• `` -&gt; `...1`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>citation_dry_bean_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  ...1                                                                          
+  &lt;chr&gt;                                                                         
+1 "Citation Request :\r\nKOKLU, M. and OZKAN, I.A., (2020), “Multiclass Classif…</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(dplyr<span class="sc">::</span><span class="fu">pull</span>(citation_dry_bean_data, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Citation Request :
+KOKLU, M. and OZKAN, I.A., (2020), “Multiclass Classification of Dry Beans Using Computer Vision and Machine Learning Techniques.” Computers and Electronics in Agriculture, 174, 105507. DOI: https://doi.org/10.1016/j.compag.2020.105507</code></pre>
+</div>
+</div>
+</section>
 
 </main>
 <!-- /main column -->

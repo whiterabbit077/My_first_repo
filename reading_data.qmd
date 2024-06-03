@@ -25,8 +25,8 @@ read_fwf(
 
 ```{r}
 library(readxl)
-dry_bean_data <- readxl::read_excel("https://www4.stat.ncsu.edu/~online/datasets/Dry_Bean_Dataset.xlsx")
-dry_bean_data
+#dry_bean_data <- readxl::read_excel("https://www4.stat.ncsu.edu/~online/datasets/Dry_Bean_Dataset.xlsx")
+#dry_bean_data
 ```
 
 
