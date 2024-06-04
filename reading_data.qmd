@@ -59,4 +59,126 @@ citation_dry_bean_data
 
 cat(dplyr::pull(citation_dry_bean_data, 1))
 ```
+## Manipulate air quality data to clean it up
 
+```{r}
+air_quality |>
+  select(-starts_with("...")) |>
+  rename("co_gt" = CO.GT.) |>
+  filter(co_gt != -200) |>
+  mutate(mean_co_gt = mean(co_gt, na.rm = TRUE))
+
+
+```
+
+same for all numeric
+
+```{r}
+air_quality |>
+  select(-starts_with("...")) |>
+  rename("co_gt" = CO.GT.) |>
+  filter(co_gt != -200) |>
+  mutate(across(where(is.numeric),
+                list(mean=mean,sd=sd),
+                .names = "{.col}_{.fn}"))
+
+```
+
+
+Adding grouping variable
+
+
+```{r}
+air_quality |>
+  select(-starts_with("...")) |>
+  rename("co_gt" = CO.GT.) |>
+  filter(co_gt != -200) |>
+  group_by(Date) |>
+  mutate(across(where(is.numeric),
+                list(mean=mean,sd=sd),
+                .names = "{.col}_{.fn}"))
+
+```
+
+
+## connecting to db
+
+```{r}
+library(RSQLite)
+library(DBI)
+con <- dbConnect(RSQLite::SQLite(), "lahman.db")
+
+dbListTables(con)
+library(dplyr)
+tbl(con, "Pitching")
+```
+
+```{r}
+tbl(con, "Pitching") |>
+  select(ends_with("ID")) |>
+  filter(yearID == 2010) 
+```
+
+```{r}
+tbl(con, "Pitching") |>
+  select(ends_with("ID")) |>
+  filter(yearID == 2010) |>
+  collect()
+```
+
+```{r}
+tbl(con, "Pitching") |>
+  select(ends_with("ID")) |>
+  filter(yearID == 2010) |>
+  show_query()
+```
+
+```{r}
+dbDisconnect(con)
+```
+
+
+## Connect to db from a Video
+
+```{r}
+library(bigrquery)
+library(DBI)
+library(tidyverse)
+library(RSQLite)
+
+#con <- dbConnect(
+#  bigrquery::bigquery(
+#    project = "bigquery-public-data",
+#    dataset = "google_trends",
+#    billing = "st-558-424715"
+#  )
+#)
+
+#dbListTables(con)
+
+#my_data <- tbl(con, "top_terms") |>
+#  select(refresh_date, term, rank, dma_id, dma_name) |>
+#  rename("Day"="refresh_date",
+#         "Top_term"="term")|>
+#  filter(rank==1,
+#         Day > lubridate::as_date("2024-05-14"),
+#         dma_id == 500) |>
+#  collect()
+  
+```
+
+## Joins
+
+```{r}
+library(RSQLite)
+library(DBI)
+library(dplyr)
+
+con <- dbConnect(RSQLite::SQLite(), "lahman.db")
+dbListTables(con)
+
+inner_join(tbl(con,"Batting")|>filter(yearID==2000),tbl(con,"Pitching")|>filter(yearID==2000),by=join_by(playerID==playerID, stint==stint,teamID==teamID,lgID==lgID))|>
+  collect()
+
+
+```
