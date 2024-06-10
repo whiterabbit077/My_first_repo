@@ -1,0 +1,194 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+author: Anna Giczewska
+---
+
+## EDA
+
+```{r}
+library(tidyverse)
+library(readxl)
+app_data <- read_excel("app_data.xlsx", sheet = 1)
+app_data <- app_data |>
+  mutate(BMI = as.numeric(BMI),
+         US_Number = as.character(US_Number),
+         SexF = factor(Sex, levels = c("female", "male"), labels = c("Female", "Male")),
+         DiagnosisF = as.factor(Diagnosis),
+         SeverityF = as.factor(Severity))
+app_data
+
+```
+
+## contingency tables
+
+```{r}
+table(app_data$SexF)
+table(app_data$SexF, useNA = "always")
+table(app_data$SexF, app_data$DiagnosisF)
+```
+
+```{r}
+two_way_sex_diag <- table(app_data$SexF, app_data$DiagnosisF)
+two_way_sex_diag[,1]
+```
+
+```{r}
+table(app_data$SexF, app_data$DiagnosisF, app_data$SeverityF)
+```
+
+```{r}
+three_way <- table(app_data$SexF, app_data$DiagnosisF, app_data$SeverityF)
+three_way[, , "uncomplicated"]
+```
+
+```{r}
+app_data |>
+  group_by(SexF) |>
+  summarize(count = n())
+```
+
+```{r}
+app_data |>
+  drop_na(SexF) |>
+  group_by(SexF) |>
+  summarize(count = n())
+```
+
+
+```{r}
+app_data |>
+  drop_na(SexF, DiagnosisF) |>
+  group_by(SexF, DiagnosisF) |>
+  summarize(count = n())
+```
+
+
+```{r}
+app_data |>
+  drop_na(SexF, DiagnosisF) |>
+  group_by(SexF, DiagnosisF) |>
+  summarize(count = n()) |>
+  pivot_wider(names_from = DiagnosisF, values_from = count)
+```
+
+```{r}
+app_data |>
+  drop_na(SexF, DiagnosisF, SeverityF) |>
+  group_by(SexF, DiagnosisF, SeverityF) |>
+  summarize(count = n())
+```
+
+
+```{r}
+app_data |>
+  drop_na(SexF, DiagnosisF, SeverityF) |>
+  group_by(SexF, DiagnosisF, SeverityF) |>
+  summarize(count = n()) |>
+  pivot_wider(names_from = SeverityF, values_from = count)
+```
+
+
+## Numerical Variable Summaries
+
+```{r}
+library(tidyverse)
+library(readxl)
+
+app_data <- read_excel("app_data.xlsx", sheet = 1)
+app_data <- app_data |>
+  mutate(BMI = as.numeric(BMI),
+         US_Number = as.character(US_Number),
+         SexF = factor(Sex, levels = c("female", "male"), labels = c("Female", "Male")),
+         DiagnosisF = as.factor(Diagnosis),
+         SeverityF = as.factor(Severity))
+app_data
+
+app_data |>
+  summarize(mean_BMI = mean(BMI, na.rm = TRUE), med_BMI = median(BMI, na.rm = TRUE))
+```
+
+```{r}
+app_data |>
+  summarize(across(where(is.numeric), 
+                   list("mean" = mean, "median" = median), 
+                   .names = "{.fn}_{.col}"))
+```
+
+```{r}
+app_data |>
+  summarize(across(where(is.numeric), 
+                   list("mean" = ~ mean(.x, na.rm = TRUE), "median" = ~ median(.x, na.rm = TRUE)), 
+                   .names = "{.fn}_{.col}"))
+```
+
+```{r}
+app_data |>
+  group_by(Diagnosis, Sex) |>
+  drop_na(Diagnosis, Sex) |>
+  summarize(mean_BMI = mean(BMI, na.rm = TRUE), med_BMI = median(BMI, na.rm = TRUE))
+```
+
+
+```{r}
+app_data |>
+  group_by(Diagnosis, Sex) |>
+  drop_na(Diagnosis, Sex) |>
+  summarize(across(where(is.numeric), 
+                   list("mean" = ~ mean(.x, na.rm = TRUE), "median" = ~ median(.x, na.rm = TRUE)), 
+                   .names = "{.fn}_{.col}"))
+```
+
+
+
+```{r}
+app_data |>
+  group_by(Diagnosis, Sex) |>
+  drop_na(Diagnosis, Sex) |>
+  summarize(sd_BIM = sd(BMI, na.rm = TRUE), IQR_BMI = IQR(BMI, na.rm = TRUE))
+```
+
+
+```{r}
+app_data |>
+  group_by(Diagnosis, Sex) |>
+  drop_na(Diagnosis, Sex) |>
+  summarize(correlation = cor(BMI, Age))
+```
+
+
+```{r}
+app_data |>
+  group_by(Diagnosis, Sex) |>
+  drop_na(Diagnosis, Sex) |>
+  summarize(correlation = cor(BMI, Age, use = "pairwise.complete.obs"))
+```
+
+
+```{r}
+library(GGally) #install if needed
+ggpairs(app_data |> drop_na(RBC_Count, Weight, Diagnosis, Sex) |> filter(RBC_Count < 8),
+ aes(colour = Diagnosis, alpha = 0.4), columns = c("RBC_Count", "Weight", "Sex"))
+
+```
+
+
+```{r}
+##install each if needed
+#library(gapminder)
+#library(gganimate)
+#library(gifski)
+#gif <- ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, colour = country)) +
+# geom_point(alpha = 0.7, show.legend = FALSE) +
+# scale_colour_manual(values = country_colors) +
+# scale_size(range = c(2, 12)) +
+# scale_x_log10() +
+# facet_wrap(~continent) +
+# # Here comes the gganimate specific bits
+# labs(title = 'Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy') +
+# transition_time(year) +
+# ease_aes('linear')
+#anim_save(filename = "img/myGif.gif", animation = gif, renderer = gifski_renderer())
+```
+
